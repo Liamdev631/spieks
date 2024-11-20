@@ -1,1 +1,7 @@
-**.lock
+# Poetry
+poetry.lock
+*.pyc
+spieks/__pycache__/
+/dist/
+/build/
+/examples/tmp/**
