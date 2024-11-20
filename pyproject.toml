@@ -1,0 +1,13 @@
+[tool.poetry]
+name = "spieks"
+version = "0.0.1"
+description = "A library from simulating SNNs"
+authors = ["Liam Bury <liambury@outlook.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
