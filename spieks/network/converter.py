@@ -1,0 +1,32 @@
+from spieks.network import SpikingNetwork
+from spieks.neurons import SpikingNeuron, IF
+from torch.__future__ import set_overwrite_module_params_on_conversion
+import torch.nn as nn
+import copy
+
+class Converter():
+    @staticmethod
+    def convert(
+        model: nn.Module,
+        dt: float = 1e-3,
+        model_subs: dict[nn.Module, SpikingNeuron] = { nn.ReLU: IF }
+    ) -> SpikingNetwork:
+        # Deepcopy the original ANN
+        set_overwrite_module_params_on_conversion(True)
+        new_net = copy.deepcopy(model)
+
+        # Replace all layers in the network according to 'replacements'
+        for (old_layer_type, new_layer_type) in model_subs.items():
+            new_net = Converter.swap_layers(new_net, old_layer_type, new_layer_type, neuron_args={'dt': dt})
+
+        return SpikingNetwork(new_net, dt)
+        
+
+    @staticmethod
+    def swap_layers(model, old_layer_type: type[nn.Module], new_layer_type: type[nn.Module], neuron_args):
+        for name, module in model.named_children():
+            if isinstance(module, old_layer_type):
+                setattr(model, name, new_layer_type(*module.parameters(), **neuron_args))
+            elif isinstance(module, nn.Module):
+                Converter.swap_layers(module, old_layer_type, new_layer_type, neuron_args)
+        return model
