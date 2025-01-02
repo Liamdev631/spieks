@@ -22,10 +22,10 @@ class LearningRule(StatelikeModule):
     ...
 
 class SpikingNeuron(StatelikeModule):
-    def __init__(self, dt=1e-3, v_th=1.0, v_r=0.0):
+    def __init__(self, dt=1e-3, v_r=0.0, v_th=1.0):
         super().__init__(dt)
-        self.register_buffer('v_th', torch.tensor(v_th), persistent=False)
         self.register_buffer('v_r', torch.tensor(v_r), persistent=False)
+        self.register_buffer('v_th', torch.tensor(v_th), persistent=False)
         self.learning_rules: list[LearningRule] = []
 
     def setup(self, x):
@@ -42,8 +42,8 @@ class SpikingNeuron(StatelikeModule):
         return self.spikes
 
 class IF(SpikingNeuron):
-    def __init__(self, dt=1e-3, v_th=1.0, v_r=0.0):
-        super().__init__(dt, v_th, v_r)
+    def __init__(self, dt=1e-3, v_r=0.0, v_th=1.0):
+        super().__init__(dt, v_r, v_th)
 
     def forward(self, x):
         super().forward(x)
@@ -52,5 +52,5 @@ class IF(SpikingNeuron):
         self.v[self.spikes] -= (self.v_th - self.v_r) # Subtractive reset, more accurate
         return self.spikes.float()
 
-
-
+    def extra_repr(self):
+        return f"log(dt)={torch.log10(self.dt):.1f}, v_r={self.v_r}, v_th={self.v_th}"

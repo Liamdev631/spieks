@@ -13,20 +13,20 @@ def train(model, device, train_loader, loss_fn, optimizer):
         loss.backward()
         optimizer.step()
 
-def test(model, device, test_loader, loss_fn):
+def test_ann(model, device, test_loader, loss_fn):
     model.eval()
-    test_loss = 0
+    loss = 0
     correct = 0
+    total = 0
     with torch.no_grad():
         for data, target in test_loader:
             data, target = data.to(device), target.to(device)
             output = model(data)
-            test_loss += loss_fn(output, target).item()
+            loss += loss_fn(output, target).item()
             pred = output.argmax(dim=1, keepdim=True) # get the index of the max log-probability
             correct += pred.eq(target.view_as(pred)).sum().item()
-
-    test_loss /= len(test_loader.dataset)
-    return test_loss, correct / len(test_loader.dataset)
+            total += len(target)
+    return loss / total, correct / total
 
 def train_ann(
     model,
@@ -36,26 +36,28 @@ def train_ann(
     epochs=40,
     device=None,
     save_path="tmp/model.pth",
-    b_plot_result=True
+    b_plot_result=True,
+    initial_lr=0.01,
+    final_lr=0.001
 ) -> nn.Module:
     best_accuracy = 0
     history_loss, history_acc, history_lr = [], [], []
 
     model = model.to(device)
-    optimizer = optim.AdamW(model.parameters(), lr=5e-4, weight_decay=0.01, amsgrad=False)
-    scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, epochs//3, 5e-5)
+    optimizer = optim.SGD(model.parameters(), lr=initial_lr)
+    scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, epochs, final_lr)
 
     # Training loop
     for epoch in range(1, epochs+1):
         train(model, device, train_loader, loss_fn, optimizer)
-        loss, acc = test(model, device, test_loader, loss_fn)
+        loss, acc = test_ann(model, device, test_loader, loss_fn)
         scheduler.step()
 
         history_loss.append(loss)
         history_acc.append(acc)
         history_lr.append(scheduler.get_last_lr())
 
-        print(f"Epoch {epoch}/{epochs}, Loss: {loss:.4f}, Accuracy: {acc*100:.4f}%, LR: {scheduler.get_last_lr()[0]}")
+        print(f"Epoch {epoch}/{epochs}, Loss: {loss:.4f}, Accuracy: {acc*100:.4f}%")
 
         # Save the model if it's the best so far
         if acc > best_accuracy:
@@ -83,3 +85,5 @@ def train_ann(
 
         plt.tight_layout()
         plt.show()
+
+    return model

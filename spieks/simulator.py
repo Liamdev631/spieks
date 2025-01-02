@@ -12,13 +12,16 @@ class Simulator():
 		duration: float, # The duration of the experiment (in seconds).
 		b_reset_net: bool = True # If true, call spieks.utils.reset_net on the net first.
 	):
+		if not isinstance(net, SpikingNetwork):
+			raise TypeError("spieks.Simulator's are intended to be used with Spiking Networks only")
+
 		self.net = net
 		self.duration = duration
 		self.b_reset_net = b_reset_net
 
 		self.timesteps = int(duration / self.net.dt)
 
-	def run(
+	def simulate(
 		self,
 		inputs: torch.Tensor,
 		b_spiking_inputs: bool = True
@@ -31,9 +34,10 @@ class Simulator():
 		history_out = []
 		with torch.no_grad():
 			for i in range(self.timesteps):
-				out = self.net(inputs[i] if b_spiking_inputs else inputs)
+				inp = inputs[i] if b_spiking_inputs else inputs
+				out = self.net(inp)
 				history_out.append(out)
-		out_mean = torch.stack(history_out).mean(dim=0) / self.net.dt
+		out_mean = torch.stack(history_out).mean(dim=0)
 		return out_mean
 
 class Classifier(Simulator):
@@ -41,13 +45,11 @@ class Classifier(Simulator):
 		self,
 		net: SpikingNetwork, # The network to simulate.
 		duration: float, # The duration of the experiment (in seconds).
-		test_dataset: torch.utils.data.Dataset, # The testing dataset used to evaluate the net.
+		test_loader: torch.utils.data.DataLoader, # The testing dataset used to evaluate the net.
 		b_reset_net: bool = True, # If true, call spieks.utils.reset_net on the net first.
-		batch_size: int = 64, # The batch size to use while evaluating the net.
 	):
 		super().__init__(net, duration, b_reset_net)
-		self.batch_size = batch_size
-		self.dataloader = torch.utils.data.DataLoader(test_dataset, batch_size, shuffle=False)
+		self.test_loader = test_loader
 		self.loss_fn = nn.CrossEntropyLoss()
 
 	def run(
@@ -67,14 +69,15 @@ class Classifier(Simulator):
 
 		self.net.to(device)
 		self.net.eval()
-		for inputs, targets in tqdm(self.dataloader):
-			inputs, targets = inputs.to(device), targets.to(device)
-			total += len(targets)
-			outputs = super().run(inputs, b_spiking_inputs)
-			loss = self.loss_fn(outputs, targets)
-			running_loss += loss * len(targets)
-			pred = outputs.argmax(dim=1, keepdim=True) # get the index of the max log-probability
-			correct += pred.eq(targets.view_as(pred)).sum().item()
+		with torch.no_grad():
+			for inputs, targets in tqdm(self.test_loader):
+				inputs, targets = inputs.to(device), targets.to(device)
+				total += len(targets)
+				outputs = self.simulate(inputs, b_spiking_inputs)
+				loss = self.loss_fn(outputs, targets)
+				running_loss += loss * len(targets)
+				pred = outputs.argmax(dim=1, keepdim=True) # get the index of the max log-probability
+				correct += pred.eq(targets.view_as(pred)).sum().item()
 		loss = running_loss / total
 		accuracy = correct / total
 
