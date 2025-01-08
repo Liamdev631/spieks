@@ -24,8 +24,8 @@ class LearningRule(StatelikeModule):
 class SpikingNeuron(StatelikeModule):
     def __init__(self, dt=1e-3, v_r=0.0, v_th=1.0):
         super().__init__(dt)
-        self.v_r = torch.tensor(v_r)
-        self.v_th = torch.tensor(v_th)
+        self.v_r = v_r
+        self.v_th = v_th
         self.learning_rules: list[LearningRule] = []
 
     def setup(self, x):
