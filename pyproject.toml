@@ -1,18 +1,28 @@
-[tool.poetry]
+[build-system]
+requires = ["setuptools>=75.1.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
 name = "spieks"
 version = "0.0.1"
-description = "A library from simulating SNNs"
-authors = ["Liam Bury <liambury@outlook.com>"]
-readme = "README.md"
+description = "A library for simulating SNNs"
+long_description = {file = "README.md"}
+long_description_content_type = "text/markdown"
+authors = [
+    {name = "Liam Bury", email = "liambury@outlook.com"}
+]
+url = "https://github.com/Liamdev631/spieks"
 
-[tool.poetry.dependencies]
-python = "^3.11"
-pytorch = "^2.5.1"
-setuptools = "^75.1.0"
-torchaudio = "^2.5.1"
-torchvision = "^0.20.1"
-tqdm = "^4.67.1"
+[tool.setuptools.packages.find]
+where = ["spieks"]
 
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+[tool.setuptools.dependencies]
+install_requires = [
+    "torch>=2.5.1",
+    "torchaudio>=2.5.1",
+    "torchvision>=0.20.1",
+    "tqdm>=4.67.1"
+]
+
+[tool.setuptools.python]
+python_requires = ">=3.11"
