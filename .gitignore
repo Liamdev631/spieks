@@ -5,3 +5,4 @@ spieks/__pycache__/
 /dist/
 /build/
 /examples/tmp/**
+*.ipynb_checkpoints
