@@ -16,9 +16,11 @@ class Converter():
         set_overwrite_module_params_on_conversion(True)
         new_net = copy.deepcopy(model)
 
+        neuron_args.update({'dt': dt})
+
         # Replace all layers in the network according to 'replacements'
         for (old_layer_type, new_layer_type) in model_subs.items():
-            new_net = swap_layers(new_net, old_layer_type, new_layer_type, neuron_args={"dt": dt}.update(neuron_args))
+            new_net = swap_layers(new_net, old_layer_type, new_layer_type, neuron_args)
 
         return SpikingNetwork(new_net, dt)
 
