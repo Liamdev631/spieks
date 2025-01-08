@@ -6,8 +6,12 @@ authors = ["Liam Bury <liambury@outlook.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.11"
 pytorch = "^2.5.1"
+setuptools = "^75.1.0"
+torchaudio = "^2.5.1"
+torchvision = "^0.20.1"
+tqdm = "^4.67.1"
 
 [build-system]
 requires = ["poetry-core"]
