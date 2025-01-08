@@ -1,25 +1,15 @@
-[build-system]
-requires = ["setuptools>=75.1.0", "wheel"]
-build-backend = "setuptools.build_meta"
-
 [project]
 name = "spieks"
 version = "0.0.1"
 description = "A library for simulating SNNs"
-long_description = {file = "README.md"}
-long_description_content_type = "text/markdown"
-authors = [
-    {name = "Liam Bury", email = "liambury@outlook.com"}
-]
-url = "https://github.com/Liamdev631/spieks"  # Add URL if applicable
-python_requires = ">=3.11"
-
+readme = "README.md"
+authors = [{ name = "Liam Bury" }]
+license = { text = "Apache-2.0" }
+requires-python = ">=3.11"
+classifiers = ["License :: OSI Approved :: Apache Software License"]
 dependencies = [
-    "torch>=2.5.1",
-    "torchaudio>=2.5.1",
-    "torchvision>=0.20.1",
-    "tqdm>=4.67.1"
+	"torch>=2.5.1",
+	"torchaudio>=2.5.1",
+	"torchvision>=0.20.1",
+	"tqdm>=4.67.1"
 ]
-
-[tool.setuptools.packages.find]
-where = ["spieks"]  # Assuming your code is in the spieks directory
