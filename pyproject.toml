@@ -14,7 +14,6 @@ authors = [
 url = "https://github.com/Liamdev631/spieks"  # Add URL if applicable
 python_requires = ">=3.11"
 
-[project.dependencies]
 dependencies = [
     "torch>=2.5.1",
     "torchaudio>=2.5.1",
