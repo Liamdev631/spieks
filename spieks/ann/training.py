@@ -48,7 +48,8 @@ def train_ann(
     scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, epochs, final_lr)
 
     # Training loop
-    for epoch in range(1, epochs+1):
+    pbar = trange(1, epochs+1)
+    for epoch in pbar:
         train(model, device, train_loader, loss_fn, optimizer)
         loss, acc = test_ann(model, device, test_loader, loss_fn)
         scheduler.step()
@@ -57,7 +58,8 @@ def train_ann(
         history_acc.append(acc)
         history_lr.append(scheduler.get_last_lr())
 
-        print(f"Epoch {epoch}/{epochs}, Loss: {loss:.4f}, Accuracy: {acc*100:.4f}%")
+        #print(f"Epoch {epoch}/{epochs}, Loss: {loss:.4f}, Accuracy: {acc*100:.4f}%")
+        pbar.set_description(f"Loss: {loss:.3f}, Accuracy: {acc*100:.2f}%")
 
         # Save the model if it's the best so far
         if acc > best_accuracy:

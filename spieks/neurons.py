@@ -44,13 +44,15 @@ class SpikingNeuron(StatelikeModule):
 class IF(SpikingNeuron):
     def __init__(self, dt=1e-3, v_r=0.0, v_th=1.0):
         super().__init__(dt, v_r, v_th)
+        self.rescale_factor = 1.0 / self.dt # Cancels dt scaling in integration
 
     def forward(self, x):
         super().forward(x)
         self.v += x * self.dt
         self.spikes = self.v > self.v_th
         self.v[self.spikes] -= (self.v_th - self.v_r) # Subtractive reset, more accurate
-        return self.spikes.float()
+        return self.spikes.float() * self.rescale_factor
+        #return self.spikes.float()
 
     def extra_repr(self):
         return f"log(dt)={torch.log10(self.dt):.1f}, v_r={self.v_r}, v_th={self.v_th}"

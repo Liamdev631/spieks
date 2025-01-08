@@ -6,8 +6,8 @@ authors = ["Liam Bury <liambury@outlook.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.11"
-pytorch = "^2.3.1"
+python = "^3.9"
+pytorch = "^2.5.1"
 
 [build-system]
 requires = ["poetry-core"]
