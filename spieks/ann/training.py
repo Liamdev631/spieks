@@ -22,7 +22,7 @@ def test_ann(model: nn.Module, device, test_loader, loss_fn):
         for data, target in test_loader:
             data, target = data.to(device), target.to(device)
             output = model(data)
-            loss += loss_fn(output, target).item()
+            loss += loss_fn(output, target).item() * len(target)
             pred = output.argmax(dim=1, keepdim=True) # get the index of the max log-probability
             correct += pred.eq(target.view_as(pred)).sum().item()
             total += len(target)
