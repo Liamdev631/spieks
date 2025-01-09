@@ -44,15 +44,16 @@ class Simulator():
 
 	def evaulate_dataset(
 		self,
-		input_data: torch.utils.data.DataLoader,
+		dataloader: torch.utils.data.DataLoader,
 		duration: float = 1.0,
-		b_spiking_inputs: bool = False
+		b_spiking_inputs: bool = False,
+		b_show_progress: bool = False
 	) -> torch.Tensor:
 
 		outputs = []
 		with torch.no_grad():
-			for inputs, _ in tqdm(input_data):
-				#targets = targets.to(self.device)
+			iterator = tqdm(dataloader) if b_show_progress else dataloader
+			for inputs, _ in iterator:
 				out = self.evaluate(inputs, duration, b_spiking_inputs)
 				outputs.append(out)
 		out_history = torch.cat(out_history, dim=-2)
@@ -108,7 +109,8 @@ class Classifier(Simulator):
 		self,
 		dataloader: torch.utils.data.DataLoader,
 		duration: float = 1.0,
-		b_spiking_inputs: bool = False
+		b_spiking_inputs: bool = False,
+		b_show_progress: bool = False
 	) -> torch.Tensor:
 
 		all_activations = []
@@ -116,7 +118,8 @@ class Classifier(Simulator):
 		all_accuracy = []
 
 		with torch.no_grad():
-			for inputs, targets in tqdm(dataloader):
+			iterator = tqdm(dataloader) if b_show_progress else dataloader
+			for inputs, targets in iterator:
 				activations, loss, accuracy = self.evaluate(inputs, targets, duration, b_spiking_inputs)
 				all_activations.append(activations)
 				all_loss.append(loss)
