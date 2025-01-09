@@ -25,6 +25,9 @@ class StatelikeModule(nn.Module):
             noise = torch.normal(0, self.noise_std, size=x.shape).to(x.device)
             x = x + noise
         return x
+    
+    def extra_repr(self):
+        return f"log(dt)={torch.log10(self.dt):.0f}, noise_std={self.noise_std}"
 
 class LearningRule(StatelikeModule):
     ...
@@ -46,6 +49,9 @@ class SpikingNeuron(StatelikeModule):
         for lr in self.learning_rules:
             lr.forward(x)
         return self.spikes
+    
+    def extra_repr(self):
+        return f"log(dt)={torch.log10(self.dt):.0f}, v_r={self.v_r}, v_th={self.v_th}, noise_std={self.noise_std}"
 
 class IF(SpikingNeuron):
     def __init__(self, dt=1e-3, v_r=0.0, v_th=1.0, noise_std=0.0):
@@ -58,6 +64,3 @@ class IF(SpikingNeuron):
         self.spikes = self.v > self.v_th
         self.v[self.spikes] -= (self.v_th - self.v_r) # Subtractive reset, more accurate
         return self.spikes.float() * (self.v_th - self.v_r) * self.rescale_factor
-
-    def extra_repr(self):
-        return f"log(dt)={torch.log10(self.dt):.0f}, v_r={self.v_r}, v_th={self.v_th}"
