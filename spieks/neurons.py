@@ -30,8 +30,8 @@ class LearningRule(StatelikeModule):
     ...
 
 class SpikingNeuron(StatelikeModule):
-    def __init__(self, dt=1e-3, v_r=0.0, v_th=1.0):
-        super().__init__(dt)
+    def __init__(self, dt=1e-3, v_r=0.0, v_th=1.0, noise_std=0.0):
+        super().__init__(dt, noise_std)
         self.v_r = v_r
         self.v_th = v_th
         self.learning_rules: list[LearningRule] = []
@@ -48,8 +48,8 @@ class SpikingNeuron(StatelikeModule):
         return self.spikes
 
 class IF(SpikingNeuron):
-    def __init__(self, dt=1e-3, v_r=0.0, v_th=1.0):
-        super().__init__(dt, v_r, v_th)
+    def __init__(self, dt=1e-3, v_r=0.0, v_th=1.0, noise_std=0.0):
+        super().__init__(dt, v_r, v_th, noise_std)
         self.rescale_factor = 1.0 / self.dt # Cancels dt scaling in integration
 
     def forward(self, x):
