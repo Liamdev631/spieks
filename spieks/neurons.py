@@ -2,9 +2,10 @@ import torch
 import torch.nn as nn
 
 class StatelikeModule(nn.Module):
-    def __init__(self, dt=1e-3):
+    def __init__(self, dt=1e-3, noise_std=0.0):
         super().__init__()
         self.dt = torch.tensor(dt)
+        self.noise_std = noise_std
         self.initialized = False
     
     def setup(self, x):
@@ -16,6 +17,13 @@ class StatelikeModule(nn.Module):
     def forward(self, x):
         if not self.initialized:
             self.setup(x)
+        x = self.add_noise(x)
+        return x
+    
+    def add_noise(self, x):
+        if self.noise_std > 0.0:
+            noise = torch.normal(0, self.noise_std, size=x.shape).to(x.device)
+            x = x + noise
         return x
 
 class LearningRule(StatelikeModule):
