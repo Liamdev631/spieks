@@ -19,7 +19,7 @@ class StatelikeModule(nn.Module):
         return x
     
     def add_noise(self, x, noise_std):
-        noise = torch.normal(0, self.noise_std, size=x.shape).to(x.device)
+        noise = torch.normal(0, noise_std, size=x.shape).to(x.device)
         x = x + noise
         return x
     
