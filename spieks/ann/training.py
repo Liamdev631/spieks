@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.optim as optim
 from tqdm.notebook import tqdm, trange
 
-def train(model, device, train_loader, loss_fn, optimizer):
+def train(model: nn.Module, device, train_loader, loss_fn, optimizer):
     model.train()
     for data, target in train_loader:
         data, target = data.to(device), target.to(device)
@@ -13,7 +13,7 @@ def train(model, device, train_loader, loss_fn, optimizer):
         loss.backward()
         optimizer.step()
 
-def test_ann(model, device, test_loader, loss_fn):
+def test_ann(model: nn.Module, device, test_loader, loss_fn):
     model.eval()
     loss = 0
     correct = 0
@@ -29,7 +29,7 @@ def test_ann(model, device, test_loader, loss_fn):
     return loss / total, correct / total
 
 def train_ann(
-    model,
+    model: nn.Module,
     train_loader,
     test_loader,
     loss_fn,
