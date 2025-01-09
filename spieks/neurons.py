@@ -16,7 +16,6 @@ class StatelikeModule(nn.Module):
     def forward(self, x):
         if not self.initialized:
             self.setup(x)
-        x = self.add_noise(x)
         return x
     
     def add_noise(self, x, noise_std):
