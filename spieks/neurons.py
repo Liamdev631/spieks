@@ -68,7 +68,7 @@ class NoisyIF(IF):
         self.noise_std = noise_std
 
     def forward(self, x):
-        x = self.add_noise(x)
+        x = self.add_noise(x, self.noise_std)
         return super().forward(x)
 
     def extra_repr(self):
