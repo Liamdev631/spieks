@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+from math import sqrt
 
 class StatelikeModule(nn.Module):
     def __init__(self, dt=1e-3):
@@ -66,7 +67,7 @@ class IF(SpikingNeuron):
 class NoisyIF(IF):
     def __init__(self, dt=1e-3, v_r=0.0, v_th=1.0, noise_std=0.0):
         super().__init__(dt, v_r, v_th)
-        self.noise_std = noise_std / torch.sqrt(dt)
+        self.noise_std = noise_std / sqrt(dt)
 
     def forward(self, x):
         x = self.add_noise(x, self.noise_std)
