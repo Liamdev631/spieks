@@ -27,7 +27,10 @@ class Converter():
 def swap_layers(model: nn.Module, old_layer_type: type[nn.Module], new_layer_type: type[nn.Module], neuron_args={}):
     for name, module in model.named_children():
         if isinstance(module, old_layer_type):
-            setattr(model, name, new_layer_type(*module.parameters(), **neuron_args))
+            params = {k: getattr(module, k) for k in module.__dict__ if not k.startswith('_')}
+            new_layer = new_layer_type(**params, **neuron_args)
+            new_layer.load_state_dict(module.state_dict(), strict=False)
+            setattr(model, name, new_layer)
         elif isinstance(module, nn.Module):
             swap_layers(module, old_layer_type, new_layer_type, neuron_args)
     return model
