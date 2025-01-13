@@ -27,10 +27,16 @@ class Converter():
 def swap_layers(model: nn.Module, old_layer_type: type[nn.Module], new_layer_type: type[nn.Module], neuron_args={}):
     for name, module in model.named_children():
         if isinstance(module, old_layer_type):
-            params = {k: getattr(module, k) for k in module.__dict__ if not k.startswith('_')}
-            new_layer = new_layer_type(**params, **neuron_args)
-            new_layer.load_state_dict(module.state_dict(), strict=False)
-            setattr(model, name, new_layer)
+
+            if old_layer_type == nn.MaxPool2d and new_layer_type == nn.AvgPool2d:
+                # Extract relevant parameters specific to pooling layers
+                neuron_args['kernel_size'] = module.kernel_size
+                neuron_args['stride'] = module.stride
+                neuron_args['padding'] = module.padding
+                neuron_args['ceil_mode'] = module.ceil_mode
+                neuron_args['count_include_pad'] = getattr(module, 'count_include_pad', True)
+
+            setattr(model, name, new_layer_type(*module.parameters(), **neuron_args))
         elif isinstance(module, nn.Module):
             swap_layers(module, old_layer_type, new_layer_type, neuron_args)
     return model
