@@ -116,16 +116,19 @@ class Classifier(Simulator):
 		all_activations = []
 		all_loss = []
 		all_accuracy = []
+		total_samples = 0
 
 		with torch.no_grad():
 			iterator = tqdm(dataloader) if b_show_progress else dataloader
 			for inputs, targets in iterator:
 				activations, loss, accuracy = self.evaluate(inputs, targets, duration, b_spiking_inputs)
 				all_activations.append(activations)
-				all_loss.append(loss)
-				all_accuracy.append(accuracy)
+				all_loss.append(loss * len(targets))  # Multiply by batch size
+				all_accuracy.append(accuracy * len(targets))  # Multiply by batch size
+				total_samples += len(targets)
+
 		all_activations = torch.cat(all_activations, dim=-2)
-		loss = np.mean(all_loss, axis=0)
-		accuracy = np.mean(all_accuracy, axis=0)
+		loss = np.sum(all_loss, axis=0) / total_samples  # Sum and divide by total samples
+		accuracy = np.sum(all_accuracy, axis=0) / total_samples  # Sum and divide by total samples
 
 		return all_activations, loss, accuracy
