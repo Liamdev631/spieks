@@ -26,6 +26,16 @@ To train an ANN on the MNIST dataset, you can use the provided Jupyter notebook:
 jupyter notebook examples/test_ann2snn.ipynb
 ```
 
+We recommend substituting `ReLU` with `QCFS`. `QCFS` is a quantization-aware substitute designed to decrease inference latency in spiking networks. Modules may be substituted manually using `swap_layers`:
+
+```python
+from spieks.network.converter import swap_layers
+
+model = MNISTModel()
+model.load_state_dict(torch.load("mnist.pth", weights_only=True))
+swap_layers(model, old_layer_type=nn.ReLU, new_layer_type=QCFS, neuron_args={ "Q": Q })
+```
+
 ### Converting an ANN to an SNN
 
 The conversion process is demonstrated in the notebook. After training the ANN, you can convert it to an SNN using the `Converter` class:
@@ -34,7 +44,7 @@ The conversion process is demonstrated in the notebook. After training the ANN, 
 from spieks.network.converter import Converter
 from spieks.neurons import IF
 
-spiking_model = Converter.convert(model, DT, model_subs={ nn.ReLU: IF })
+spiking_model = Converter.convert(model, DT, model_subs={ QCFS: IF })
 ```
 
 ### Evaluating the SNN
@@ -45,9 +55,11 @@ You can evaluate the performance of the SNN on the MNIST dataset using the `Clas
 from spieks.simulator import Classifier
 
 classifier = Classifier(spiking_model, device=DEVICE)
-activations, loss, accuracy = classifier.evaluate_dataset(test_loader, duration=T)
+_activations_, loss, accuracy = classifier.evaluate_dataset(test_loader, duration=T)
 print(f"Final Accuracy: {accuracy[-1]}")
 ```
+
+![alt text](examples/ann2snn_mnist_plots.png "ANN2SNN MNIST Example")
 
 ## Examples
 

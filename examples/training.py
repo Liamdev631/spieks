@@ -57,13 +57,13 @@ def train_ann(
         history_acc.append(acc)
         history_lr.append(scheduler.get_last_lr())
 
-        #print(f"Epoch {epoch}/{epochs}, Loss: {loss:.4f}, Accuracy: {acc*100:.4f}%")
-        pbar.set_description(f"Loss: {loss:.3f}, Accuracy: {acc*100:.2f}%")
-
         # Save the model if it's the best so far
         if acc > best_accuracy:
             best_accuracy = acc
             torch.save(model.state_dict(), save_path)
+
+        #print(f"Epoch {epoch}/{epochs}, Loss: {loss:.4f}, Accuracy: {acc*100:.4f}%")
+        pbar.set_description(f"Loss: {loss:.3f}, Accuracy: {best_accuracy*100:.2f}%")
     
     if b_plot_result:
         import matplotlib.pyplot as plt
