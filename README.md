@@ -51,6 +51,8 @@ from spieks.neurons import IF
 spiking_model = Converter.convert(model, DT, model_subs={ QCFS: IF })
 ```
 
+Spieks simplifies the ANN to SNN conversion process by ensuring that all modules in your network are compatible, warning you if invalid modules such as `nn.MaxPool' are in your network. 
+
 ### Evaluating the SNN
 
 You can evaluate the performance of the SNN on the MNIST dataset using the `Classifier` class:
@@ -60,7 +62,6 @@ from spieks.simulator import Classifier
 
 classifier = Classifier(spiking_model, device=DEVICE)
 _activations_, loss, accuracy = classifier.evaluate_dataset(test_loader, duration=T)
-print(f"Final Accuracy: {accuracy[-1]}")
 ```
 
 ![alt text](examples/ann2snn_mnist_plots.png "ANN2SNN MNIST Example")
