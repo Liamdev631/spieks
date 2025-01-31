@@ -6,7 +6,7 @@ class QCFS(nn.Module):
     def __init__(self, Q: int):
         super().__init__()
         self.Q = Q
-        self.v_th = nn.Parameter(torch.tensor(Q), requires_grad=True)
+        self.v_th = nn.Parameter(torch.tensor(float(Q)), requires_grad=True)
         self.p0 = torch.tensor(0.5)
 
     @staticmethod
