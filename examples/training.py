@@ -36,7 +36,7 @@ def train_ann(
     epochs=40,
     device=None,
     save_path="tmp/model.pth",
-    b_plot_result=True,
+    b_plot_result=False,
     initial_lr=0.01,
 ) -> nn.Module:
     best_accuracy = 0
@@ -50,20 +50,20 @@ def train_ann(
     pbar = trange(1, epochs+1)
     for epoch in pbar:
         train(model, device, train_loader, loss_fn, optimizer)
-        loss, acc = test_ann(model, device, test_loader, loss_fn)
+        test_loss, test_acc = test_ann(model, device, test_loader, loss_fn)
         scheduler.step()
 
-        history_loss.append(loss)
-        history_acc.append(acc)
+        history_loss.append(test_loss)
+        history_acc.append(test_acc)
         history_lr.append(scheduler.get_last_lr())
 
         # Save the model if it's the best so far
-        if acc > best_accuracy:
-            best_accuracy = acc
+        if test_acc > best_accuracy:
+            best_accuracy = test_acc
             torch.save(model.state_dict(), save_path)
 
         #print(f"Epoch {epoch}/{epochs}, Loss: {loss:.4f}, Accuracy: {acc*100:.4f}%")
-        pbar.set_description(f"Loss: {loss:.3f}, Accuracy: {best_accuracy*100:.2f}%")
+        pbar.set_description(f"Loss: {test_loss:.3f}, Accuracy: {best_accuracy*100:.2f}%")
     
     if b_plot_result:
         import matplotlib.pyplot as plt
