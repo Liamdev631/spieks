@@ -46,7 +46,7 @@ def swap_layers(model: nn.Module, old_layer_type: type[nn.Module], new_layer_typ
 	for name, module in model.named_children():
 		if isinstance(module, old_layer_type):
 
-			neuron_args.update(*module.parameters())
+			neuron_args = copy.deepcopy(*module.parameters())
 
 			if old_layer_type in [nn.BatchNorm1d, nn.BatchNorm2d, nn.BatchNorm3d]:
 				raise ValueError(f"Cannot convert {old_layer_type} to {new_layer_type}")
