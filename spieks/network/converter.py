@@ -46,6 +46,8 @@ def swap_layers(model: nn.Module, old_layer_type: type[nn.Module], new_layer_typ
 	for name, module in model.named_children():
 		if isinstance(module, old_layer_type):
 
+			neuron_args.update(*module.parameters())
+
 			if old_layer_type in [nn.BatchNorm1d, nn.BatchNorm2d, nn.BatchNorm3d]:
 				raise ValueError(f"Cannot convert {old_layer_type} to {new_layer_type}")
 
@@ -57,7 +59,8 @@ def swap_layers(model: nn.Module, old_layer_type: type[nn.Module], new_layer_typ
 				neuron_args['ceil_mode'] = module.ceil_mode
 				neuron_args['count_include_pad'] = getattr(module, 'count_include_pad', True)
 
-			setattr(model, name, new_layer_type(*module.parameters(), **neuron_args))
+			# Ensure neuron_args are passed correctly
+			setattr(model, name, new_layer_type(**neuron_args))
 		elif isinstance(module, nn.Module):
 			swap_layers(module, old_layer_type, new_layer_type, neuron_args)
 	return model
