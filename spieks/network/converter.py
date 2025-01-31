@@ -24,13 +24,12 @@ class Converter():
 		model: nn.Module,
 		dt: float = 1e-3,
 		model_subs: dict[nn.Module, SpikingNeuron] = { nn.ReLU: IF },
-		neuron_args: dict = {}
 	) -> SpikingNetwork:
 		# Deepcopy the original ANN
 		set_overwrite_module_params_on_conversion(True)
 		new_net = copy.deepcopy(model)
 
-		neuron_args.update({'dt': dt})
+		neuron_args = { 'dt': dt }
 
 		# Replace all layers in the network according to 'replacements'
 		for (old_layer_type, new_layer_type) in model_subs.items():
