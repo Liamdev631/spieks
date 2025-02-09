@@ -22,14 +22,13 @@ class Converter():
 	@staticmethod
 	def convert(
 		model: nn.Module,
-		dt: float = 1e-3,
 		model_subs: dict[nn.Module, SpikingNeuron] = { nn.ReLU: IF },
+		neuron_args: dict = {}
 	) -> SpikingNetwork:
+		
 		# Deepcopy the original ANN
 		set_overwrite_module_params_on_conversion(True)
 		new_net = copy.deepcopy(model)
-
-		neuron_args = { 'dt': dt }
 
 		# Replace all layers in the network according to 'replacements'
 		for (old_layer_type, new_layer_type) in model_subs.items():
@@ -40,7 +39,7 @@ class Converter():
 			if type(module) in UNCONVERTABLE_MODULES:
 				raise TypeError(f"Module {name} of type {type(module)} cannot be used in an SNN!")
 
-		return SpikingNetwork(new_net, dt)
+		return SpikingNetwork(new_net, neuron_args["dt"])
 
 def swap_layers(model: nn.Module, old_layer_type: type[nn.Module], new_layer_type: type[nn.Module], neuron_args={}):
 	for name, module in model.named_children():
@@ -57,7 +56,7 @@ def swap_layers(model: nn.Module, old_layer_type: type[nn.Module], new_layer_typ
 				neuron_args['ceil_mode'] = module.ceil_mode
 				neuron_args['count_include_pad'] = getattr(module, 'count_include_pad', True)
 
-			setattr(model, name, new_layer_type(*module.parameters(), **neuron_args))
+			setattr(module, name.split('.')[-1], new_layer_type(*module.parameters(), **neuron_args))
 		elif isinstance(module, nn.Module):
 			swap_layers(module, old_layer_type, new_layer_type, neuron_args)
 	return model
