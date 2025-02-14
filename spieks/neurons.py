@@ -50,7 +50,7 @@ class SpikingNeuron(StatelikeModule):
         return self.spikes
     
     def extra_repr(self):
-        return f"log(dt)={torch.log10(self.dt):.0f}, v_r={self.v_r}, v_th={self.v_th}"
+        return f"log(dt)={torch.log10(self.dt):.2f}, v_r={self.v_r:.2f}, v_th={self.v_th:.2f}"
 
 class IF(SpikingNeuron):
     def __init__(self, dt=1e-3, v_r=0.0, v_th=1.0):

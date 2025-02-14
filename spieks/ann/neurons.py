@@ -25,7 +25,7 @@ class QCFS(nn.Module):
         return (x.floor() - x).detach() + x
 
     def extra_repr(self):
-        return f"Q={self.Q}, p0={self.p0.item()}, v_th={self.v_th.item():.2f}"
+        return f"Q={self.Q}, p0={self.p0.item():.2f}, v_th={self.v_th.item():.2f}"
 
     def forward(self, x):
         # y = self.floor_ste(x * self.Q / self.v_th + self.p0)
