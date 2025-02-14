@@ -56,8 +56,10 @@ def swap_layers(parent: nn.Module, old_layer_type: type[nn.Module], new_layer_ty
 				neuron_args['ceil_mode'] = module.ceil_mode
 				neuron_args['count_include_pad'] = getattr(module, 'count_include_pad', True)
 
+			module.state_dict(destination=neuron_args)
+
 			# Ensure neuron_args are passed correctly
-			setattr(parent, name, new_layer_type(**dict(module.named_parameters()), **neuron_args))
+			setattr(parent, name, new_layer_type(**neuron_args))
 		elif isinstance(module, nn.Module):
 			swap_layers(module, old_layer_type, new_layer_type, neuron_args)
 	return parent
