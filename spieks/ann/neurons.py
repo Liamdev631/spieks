@@ -34,5 +34,5 @@ class QCFS(nn.Module):
         x = x / self.v_th
         x = torch.clamp(x, 0, 1)
         x = qcfsFloor(x * self.Q + self.p0) / self.Q
-        x = self.x * self.v_th
+        x = x * self.v_th
         return x
