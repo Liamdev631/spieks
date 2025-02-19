@@ -48,19 +48,9 @@ def swap_layers(parent: nn.Module, old_layer_type: type[nn.Module], new_layer_ty
 			if old_layer_type in [nn.BatchNorm1d, nn.BatchNorm2d, nn.BatchNorm3d]:
 				raise ValueError(f"Cannot convert {old_layer_type} to {new_layer_type}")
 
-			# Extract relevant parameters specific certain layers
-			# if old_layer_type == nn.MaxPool2d and new_layer_type == nn.AvgPool2d:
-			# 	neuron_args['kernel_size'] = module.kernel_size
-			# 	neuron_args['stride'] = module.stride
-			# 	neuron_args['padding'] = module.padding
-			# 	neuron_args['ceil_mode'] = module.ceil_mode
-			# 	neuron_args['count_include_pad'] = getattr(module, 'count_include_pad', True)
-
-			# Copy all existing parameters from the old layer to the new layer
-			module.state_dict(destination=neuron_args)
-
 			# Ensure neuron_args are passed correctly
 			setattr(parent, name, new_layer_type(**neuron_args))
+			getattr(parent, name).load_state_dict(module.state_dict(), strict=False)
 		elif isinstance(module, nn.Module):
 			swap_layers(module, old_layer_type, new_layer_type, neuron_args)
 	return parent
