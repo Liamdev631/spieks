@@ -3,7 +3,7 @@ import torch.utils.data
 from spieks.network.spiking_network import SpikingNetwork
 import torch
 import torch.nn as nn
-from tqdm.notebook import tqdm
+from tqdm import tqdm
 import numpy as np
 
 class Simulator():
