@@ -14,7 +14,7 @@ qcfsFloor = GradFloor.apply
 
 # QCFS is the reproduction of the paper "QCFS"
 class QCFS(nn.Module):
-    def __init__(self, Q: int):
+    def __init__(self, Q: int = 8):
         super().__init__()
         self.Q = Q
         self.v_th = nn.Parameter(torch.tensor(float(Q)), requires_grad=True)
