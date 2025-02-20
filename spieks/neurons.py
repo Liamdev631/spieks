@@ -34,8 +34,8 @@ class LearningRule(StatelikeModule):
 class SpikingNeuron(StatelikeModule):
     def __init__(self, dt=1e-3, v_r=0.0, v_th=1.0):
         super().__init__(dt)
-        self.v_r = v_r
-        self.v_th = v_th
+        self.v_r = torch.nn.Parameter(torch.Tensor(v_r, requires_grad=False))
+        self.v_th = torch.nn.Parameter(torch.Tensor(v_th, requires_grad=False))
         self.learning_rules: list[LearningRule] = []
 
     def setup(self, x):
@@ -67,7 +67,7 @@ class IF(SpikingNeuron):
 class NoisyIF(IF):
     def __init__(self, dt=1e-3, v_r=0.0, v_th=1.0, noise_std=0.0):
         super().__init__(dt, v_r, v_th)
-        self.noise_std = torch.Parameter(torch.tensor(noise_std / sqrt(dt)), required_grad=False)
+        self.noise_std = torch.nn.Parameter(torch.tensor(noise_std / sqrt(dt)), required_grad=False)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = self.add_noise(x, self.noise_std)
