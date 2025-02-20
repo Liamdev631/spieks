@@ -62,6 +62,7 @@ class IF(SpikingNeuron):
         self.v += x * self.dt
         self.spikes = self.v > self.v_th
         self.v[self.spikes] -= (self.v_th - self.v_r) # Subtractive reset, more accurate
+        self.v.clamp_min_(self.v_r)
         return self.spikes.float() * (self.v_th - self.v_r) * self.rescale_factor
 
 class NoisyIF(IF):
