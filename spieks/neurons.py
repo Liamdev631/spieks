@@ -14,12 +14,12 @@ class StatelikeModule(nn.Module):
     def reset(self):
         self.initialized = False
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         if not self.initialized:
             self.setup(x)
         return x
     
-    def add_noise(self, x, noise_std):
+    def add_noise(self, x, noise_std) -> None:
         if noise_std > 0:
             noise = torch.randn_like(x) * noise_std
             return x + noise
@@ -43,7 +43,7 @@ class SpikingNeuron(StatelikeModule):
         self.v = torch.zeros_like(x)
         self.spikes = torch.zeros_like(x, dtype=torch.bool)
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         super().forward(x)
         for lr in self.learning_rules:
             lr.forward(x)
@@ -67,9 +67,9 @@ class IF(SpikingNeuron):
 class NoisyIF(IF):
     def __init__(self, dt=1e-3, v_r=0.0, v_th=1.0, noise_std=0.0):
         super().__init__(dt, v_r, v_th)
-        self.noise_std = noise_std / sqrt(dt)
+        self.noise_std = torch.Parameter(torch.tensor(noise_std / sqrt(dt)), required_grad=False)
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = self.add_noise(x, self.noise_std)
         return super().forward(x)
 
