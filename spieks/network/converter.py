@@ -32,7 +32,7 @@ class Converter():
 		new_net = copy.deepcopy(model)
   
 		if not "dt" in neuron_args:
-			neuron_args.update("dt", dt)
+			neuron_args.update({"dt": dt})
 
 		# Replace all layers in the network according to 'replacements'
 		for (old_layer_type, new_layer_type) in model_subs.items():
