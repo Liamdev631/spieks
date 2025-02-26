@@ -22,8 +22,7 @@ class Converter():
 	@staticmethod
 	def convert(
 		model: nn.Module,
-		model_subs: dict[nn.Module, SpikingNeuron] = { nn.ReLU: IF },
-		neuron_args: dict = {}
+		model_subs: dict[nn.Module, nn.Module | tuple[nn.Module, dict]] = { nn.ReLU: IF },
 	) -> SpikingNetwork:
 		
 		# Deepcopy the original ANN
@@ -31,7 +30,12 @@ class Converter():
 		new_net = copy.deepcopy(model)
 
 		# Replace all layers in the network according to 'replacements'
-		for (old_layer_type, new_layer_type) in model_subs.items():
+		for (old_layer_type, new_layer_specs) in model_subs.items():
+			if isinstance(new_layer_specs, tuple):
+				new_layer_type, neuron_args = new_layer_specs
+			else:
+				new_layer_type = new_layer_specs
+				neuron_args = {}
 			new_net = swap_layers(new_net, old_layer_type, new_layer_type, neuron_args)
 
 		# Perform a final validation check on the model
